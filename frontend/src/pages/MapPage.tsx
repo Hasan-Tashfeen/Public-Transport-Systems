@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MapView from "../components/MapView";
 import ModeFilter from "../components/ModeFilter";
 import SearchBar from "../components/SearchBar";
+import { CITY_NAME } from "../constants/karachi";
 import { listRoutes } from "../services/api";
 import { MODES } from "../services/editor";
 import type { RouteDetail, Stop, TransportMode } from "../types/api";
@@ -21,7 +22,7 @@ export default function MapPage() {
   return (
     <div className="map-page">
       <aside className="sidebar">
-        <h1>City Transport</h1>
+        <h1>{CITY_NAME} Transit</h1>
         <SearchBar
           onSelectRoute={(route) => navigate(`/routes/${route.id}`)}
           onSelectStop={(stop: Stop) => navigate(`/stops/${stop.id}`)}
@@ -30,20 +31,29 @@ export default function MapPage() {
         <ul className="route-list">
           {routes.map((route) => (
             <li key={route.id}>
-              <button
-                type="button"
-                onClick={() => navigate(`/routes/${route.id}`)}
-              >
-                <span className="swatch" style={{ background: route.color }} />
-                {route.number} {route.name ?? ""} ({route.mode})
+              <button type="button" onClick={() => navigate(`/routes/${route.id}`)}>
+                <span
+                  className="bullet"
+                  style={{ background: route.color }}
+                  aria-hidden="true"
+                >
+                  {route.number}
+                </span>
+                {route.name ?? `Route ${route.number}`}
               </button>
             </li>
           ))}
         </ul>
         {routes.length === 0 && (
-          <p className="muted">No routes mapped yet.</p>
+          <p className="muted">
+            No routes mapped yet. Add {CITY_NAME}&rsquo;s first route.
+          </p>
         )}
-        <button type="button" onClick={() => navigate("/editor")}>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => navigate("/editor")}
+        >
           Add route
         </button>
       </aside>

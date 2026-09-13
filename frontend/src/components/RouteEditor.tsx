@@ -1,19 +1,23 @@
 import { useState } from "react";
+import { MODE_LABELS } from "../constants/karachi";
 import { createRoute, createStop, updateRoute } from "../services/api";
 import { MODES, buildRouteInput, modeColor } from "../services/editor";
 import type {
+  PlaceSuggestion,
   RouteDetail,
   Schedule,
   TransportMode,
   WaypointInput,
 } from "../types/api";
 import MapView from "./MapView";
+import PlaceAutocomplete from "./PlaceAutocomplete";
 import { ScheduleForm } from "./ScheduleView";
 
 interface EditorStop {
   stop_id: string;
   sequence: number;
   name: string;
+  area: string | null;
   lat: number;
   lng: number;
 }
@@ -32,6 +36,7 @@ export default function RouteEditor({ initial, onSaved }: RouteEditorProps) {
       stop_id: s.stop_id,
       sequence: s.sequence,
       name: s.stop.name,
+      area: s.stop.area,
       lat: s.stop.lat,
       lng: s.stop.lng,
     })) ?? [],
@@ -43,10 +48,9 @@ export default function RouteEditor({ initial, onSaved }: RouteEditorProps) {
       lng: w.lng,
     })) ?? [],
   );
-  const [schedule, setSchedule] = useState<Schedule | null>(
-    initial?.schedule ?? null,
-  );
+  const [schedule, setSchedule] = useState<Schedule | null>(initial?.schedule ?? null);
   const [addingStops, setAddingStops] = useState(true);
+  const [stopQuery, setStopQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,14 +63,39 @@ export default function RouteEditor({ initial, onSaved }: RouteEditorProps) {
       });
       setStops((prev) => [
         ...prev,
-        { stop_id: stop.id, sequence: prev.length, name: stop.name, lat, lng },
+        {
+          stop_id: stop.id,
+          sequence: prev.length,
+          name: stop.name,
+          area: stop.area,
+          lat,
+          lng,
+        },
       ]);
     } else {
-      setWaypoints((prev) => [
-        ...prev,
-        { sequence: prev.length, lat, lng },
-      ]);
+      setWaypoints((prev) => [...prev, { sequence: prev.length, lat, lng }]);
     }
+  }
+
+  async function handlePlaceSelect(place: PlaceSuggestion) {
+    const stop = await createStop({
+      name: place.name,
+      area: place.area,
+      lat: place.lat,
+      lng: place.lng,
+    });
+    setStops((prev) => [
+      ...prev,
+      {
+        stop_id: stop.id,
+        sequence: prev.length,
+        name: stop.name,
+        area: stop.area,
+        lat: stop.lat,
+        lng: stop.lng,
+      },
+    ]);
+    setStopQuery("");
   }
 
   async function save() {
@@ -101,7 +130,7 @@ export default function RouteEditor({ initial, onSaved }: RouteEditorProps) {
       sequence: s.sequence,
       arrival_time: null,
       departure_time: null,
-      stop: { id: s.stop_id, name: s.name, lat: s.lat, lng: s.lng },
+      stop: { id: s.stop_id, name: s.name, area: s.area, lat: s.lat, lng: s.lng },
     })),
     waypoints,
     schedule,
@@ -130,11 +159,17 @@ export default function RouteEditor({ initial, onSaved }: RouteEditorProps) {
           >
             {MODES.map((m) => (
               <option key={m} value={m}>
-                {m}
+                {MODE_LABELS[m]}
               </option>
             ))}
           </select>
         </label>
+        <PlaceAutocomplete
+          value={stopQuery}
+          onValueChange={setStopQuery}
+          onSelect={handlePlaceSelect}
+          label="Add stop by name"
+        />
         <ScheduleForm value={schedule} onChange={setSchedule} />
         <div className="editor-tools">
           <label>
@@ -154,7 +189,12 @@ export default function RouteEditor({ initial, onSaved }: RouteEditorProps) {
             Add waypoints
           </label>
         </div>
-        <button type="button" onClick={save} disabled={saving || !number}>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={save}
+          disabled={saving || !number}
+        >
           {saving ? "Saving…" : "Save route"}
         </button>
         {error && <p className="error">{error}</p>}

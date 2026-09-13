@@ -51,6 +51,18 @@ manual migration step is required for the pilot.
 | `PLANNER_TOKEN` | Render | Bearer token required by editing endpoints |
 | `VITE_API_BASE` | Vercel | Backend base URL (default `/api`) |
 | `VITE_PLANNER_TOKEN` | Vercel | Editor auth token sent to the backend |
+| `GEOCODER_URL` | Render | OpenStreetMap geocoder for Karachi place suggestions |
+| `GEOCODER_USER_AGENT` | Render | Polite User-Agent sent to the geocoder |
+| `KARACHI_BBOX` | Render | `min_lon,min_lat,max_lon,max_lat` search area |
+| `KARACHI_CENTER` | Render | Default map center `lat,lng` |
+| `SEED_DISABLED` | Render | Set `1` to skip loading the bundled BRT seed data |
+
+## Map data & attribution
+
+The map uses OpenStreetMap raster tiles and an OpenStreetMap-based geocoder
+(Photon by default). Keep the visible OpenStreetMap attribution on the map. The
+public Photon demo server is rate-limited; if usage grows, set `GEOCODER_URL` to a
+self-hosted Photon instance. Place search is restricted to `KARACHI_BBOX`.
 
 ## Caveats
 

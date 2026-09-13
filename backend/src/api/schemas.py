@@ -14,6 +14,7 @@ class RouteBase(BaseModel):
 
 class StopInput(BaseModel):
     name: str
+    area: str | None = None
     lat: float
     lng: float
 
@@ -82,3 +83,10 @@ class StopDetail(Stop):
 class SearchResults(BaseModel):
     routes: list[Route] = Field(default_factory=list)
     stops: list[Stop] = Field(default_factory=list)
+
+
+class PlaceSuggestion(BaseModel):
+    name: str
+    area: str | None = None
+    lat: float
+    lng: float

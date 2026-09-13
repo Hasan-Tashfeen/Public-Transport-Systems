@@ -1,0 +1,449 @@
+openapi: 3.0.3
+info:
+  title: Karachi Transit Map API
+  version: 0.2.0
+  description: |
+    REST API for viewing and editing Karachi public transport routes (BRT, bus,
+    minibus), stops, schedules, and for suggesting real Karachi places while a
+    planner enters stop names. Editing endpoints require planner authorization.
+    Property names are snake_case, matching the implementation.
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: Liveness check
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required: [status]
+  /routes:
+    get:
+      summary: List all routes
+      parameters:
+        - name: mode
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/TransportMode'
+      responses:
+        '200':
+          description: Routes (with geometry and schedule), optionally filtered by mode
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RouteDetail'
+    post:
+      summary: Create a route (planner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteInput'
+      responses:
+        '201':
+          description: Created route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+        '400':
+          description: Invalid route input
+        '401':
+          description: Planner authorization required
+  /routes/{route_id}:
+    parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a route with its ordered stops, waypoints, and schedule
+      responses:
+        '200':
+          description: Route detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+        '404':
+          description: Route not found
+    patch:
+      summary: Update a route (planner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteInput'
+      responses:
+        '200':
+          description: Updated route detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+        '400':
+          description: Invalid route input
+        '401':
+          description: Planner authorization required
+        '404':
+          description: Route not found
+    delete:
+      summary: Delete a route (planner)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Route deleted
+        '401':
+          description: Planner authorization required
+        '404':
+          description: Route not found
+  /stops:
+    get:
+      summary: List all stops
+      responses:
+        '200':
+          description: All stops
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stop'
+    post:
+      summary: Create a stop (planner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StopInput'
+      responses:
+        '201':
+          description: Created stop
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stop'
+        '401':
+          description: Planner authorization required
+  /stops/{stop_id}:
+    parameters:
+      - name: stop_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a stop with the routes that serve it
+      responses:
+        '200':
+          description: Stop detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopDetail'
+        '404':
+          description: Stop not found
+  /search:
+    get:
+      summary: Search routes and stops by name or number
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matching routes and stops
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+  /places:
+    get:
+      summary: Suggest real Karachi places for a partially typed stop name
+      description: |
+        Proxies an OpenStreetMap geocoder, restricted to the Karachi bounding box.
+        Returns an empty list (200) when there are no matches or the upstream is
+        unavailable, so the planner can still enter a location manually.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 2
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            default: 5
+      responses:
+        '200':
+          description: Matching Karachi places (possibly empty)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlaceSuggestion'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    TransportMode:
+      type: string
+      enum: [brt, bus, minibus]
+    Route:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        name:
+          type: string
+          nullable: true
+        mode:
+          $ref: '#/components/schemas/TransportMode'
+        color:
+          type: string
+      required: [id, number, mode, color]
+    RouteStopInput:
+      type: object
+      properties:
+        stop_id:
+          type: string
+          format: uuid
+        sequence:
+          type: integer
+        arrival_time:
+          type: string
+          nullable: true
+        departure_time:
+          type: string
+          nullable: true
+      required: [stop_id, sequence]
+    WaypointInput:
+      type: object
+      properties:
+        sequence:
+          type: integer
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [sequence, lat, lng]
+    ScheduleInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [fixed, frequency]
+        service_days:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+          nullable: true
+        departures:
+          type: array
+          items:
+            type: string
+          nullable: true
+        headway_minutes:
+          type: integer
+          nullable: true
+        start_time:
+          type: string
+          nullable: true
+        end_time:
+          type: string
+          nullable: true
+      required: [type]
+    RouteInput:
+      type: object
+      properties:
+        number:
+          type: string
+        name:
+          type: string
+          nullable: true
+        mode:
+          $ref: '#/components/schemas/TransportMode'
+        color:
+          type: string
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteStopInput'
+        waypoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/WaypointInput'
+        schedule:
+          $ref: '#/components/schemas/ScheduleInput'
+      required: [number, mode, color]
+    RouteStop:
+      type: object
+      properties:
+        stop_id:
+          type: string
+          format: uuid
+        sequence:
+          type: integer
+        arrival_time:
+          type: string
+          nullable: true
+        departure_time:
+          type: string
+          nullable: true
+        stop:
+          $ref: '#/components/schemas/Stop'
+      required: [stop_id, sequence, stop]
+    Waypoint:
+      type: object
+      properties:
+        sequence:
+          type: integer
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [sequence, lat, lng]
+    Schedule:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [fixed, frequency]
+        service_days:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+          nullable: true
+        departures:
+          type: array
+          items:
+            type: string
+          nullable: true
+        headway_minutes:
+          type: integer
+          nullable: true
+        start_time:
+          type: string
+          nullable: true
+        end_time:
+          type: string
+          nullable: true
+      required: [type]
+    RouteDetail:
+      allOf:
+        - $ref: '#/components/schemas/Route'
+        - type: object
+          properties:
+            stops:
+              type: array
+              items:
+                $ref: '#/components/schemas/RouteStop'
+            waypoints:
+              type: array
+              items:
+                $ref: '#/components/schemas/Waypoint'
+            schedule:
+              $ref: '#/components/schemas/Schedule'
+    Stop:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        area:
+          type: string
+          nullable: true
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [id, name, lat, lng]
+    StopInput:
+      type: object
+      properties:
+        name:
+          type: string
+        area:
+          type: string
+          nullable: true
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [name, lat, lng]
+    StopDetail:
+      allOf:
+        - $ref: '#/components/schemas/Stop'
+        - type: object
+          properties:
+            routes:
+              type: array
+              items:
+                $ref: '#/components/schemas/Route'
+    SearchResults:
+      type: object
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stop'
+      required: [routes, stops]
+    PlaceSuggestion:
+      type: object
+      properties:
+        name:
+          type: string
+        area:
+          type: string
+          nullable: true
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [name, lat, lng]

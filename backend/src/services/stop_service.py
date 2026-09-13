@@ -33,12 +33,17 @@ def get_stop(db: Session, stop_id: str) -> schemas.StopDetail:
         for rs in stop.route_stops
     ]
     return schemas.StopDetail(
-        id=stop.id, name=stop.name, lat=stop.lat, lng=stop.lng, routes=routes
+        id=stop.id,
+        name=stop.name,
+        area=stop.area,
+        lat=stop.lat,
+        lng=stop.lng,
+        routes=routes,
     )
 
 
 def create_stop(db: Session, data: schemas.StopInput) -> schemas.Stop:
-    stop = Stop(name=data.name, lat=data.lat, lng=data.lng)
+    stop = Stop(name=data.name, area=data.area, lat=data.lat, lng=data.lng)
     db.add(stop)
     db.commit()
     db.refresh(stop)

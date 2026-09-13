@@ -17,14 +17,14 @@ function makeRoute(overrides: Partial<RouteDetail> = {}): RouteDetail {
         sequence: 0,
         arrival_time: null,
         departure_time: null,
-        stop: { id: "s2", name: "B", lat: 0, lng: 0 },
+        stop: { id: "s2", name: "B", area: null, lat: 0, lng: 0 },
       },
       {
         stop_id: "s1",
         sequence: 1,
         arrival_time: null,
         departure_time: null,
-        stop: { id: "s1", name: "A", lat: 1, lng: 1 },
+        stop: { id: "s1", name: "A", area: null, lat: 1, lng: 1 },
       },
     ],
     waypoints: [],
@@ -56,25 +56,17 @@ describe("routePath", () => {
 });
 
 describe("ModeFilter", () => {
-  it("calls onChange when a mode is selected", () => {
+  it("calls onChange when a Karachi mode is selected", () => {
     const onChange = vi.fn();
-    render(
-      <ModeFilter modes={["bus", "metro"]} selected={null} onChange={onChange} />,
-    );
-    fireEvent.click(screen.getByRole("button", { name: "metro" }));
-    expect(onChange).toHaveBeenCalledWith("metro");
+    render(<ModeFilter modes={["brt", "bus"]} selected={null} onChange={onChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Bus" }));
+    expect(onChange).toHaveBeenCalledWith("bus");
   });
 
   it("marks the selected mode as active", () => {
     render(
-      <ModeFilter
-        modes={["bus", "metro"]}
-        selected="bus"
-        onChange={() => undefined}
-      />,
+      <ModeFilter modes={["brt", "bus"]} selected="brt" onChange={() => undefined} />,
     );
-    expect(screen.getByRole("button", { name: "bus" }).className).toContain(
-      "active",
-    );
+    expect(screen.getByRole("button", { name: "BRT" }).className).toContain("active");
   });
 });

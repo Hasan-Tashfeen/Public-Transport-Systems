@@ -34,6 +34,7 @@ def db_session():
 @pytest.fixture()
 def client(db_session, monkeypatch):
     monkeypatch.setenv("PLANNER_TOKEN", PLANNER_TOKEN)
+    monkeypatch.setenv("SEED_DISABLED", "1")
 
     def override_get_db():
         yield db_session

@@ -14,9 +14,7 @@ from src.config import get_planner_token
 
 _bearer = HTTPBearer(auto_error=False)
 
-PlannerCredentials = Annotated[
-    HTTPAuthorizationCredentials | None, Depends(_bearer)
-]
+PlannerCredentials = Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)]
 
 
 def require_planner(

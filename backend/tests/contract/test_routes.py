@@ -34,7 +34,9 @@ def test_list_routes_with_mode_filter(client, auth_headers, create_stop):
     )
     client.post(
         "/routes",
-        json=_route_payload([stop_a["id"], stop_c["id"]], mode="tram", schedule=None),
+        json=_route_payload(
+            [stop_a["id"], stop_c["id"]], mode="minibus", schedule=None
+        ),
         headers=auth_headers,
     )
 
@@ -86,7 +88,7 @@ def test_get_route(client, auth_headers, create_stop):
     stop_b = create_stop("Depot", 1.0, 1.0)
     created = client.post(
         "/routes",
-        json=_route_payload([stop_a["id"], stop_b["id"]], mode="metro"),
+        json=_route_payload([stop_a["id"], stop_b["id"]], mode="brt"),
         headers=auth_headers,
     ).json()
 
@@ -109,13 +111,13 @@ def test_update_route(client, auth_headers, create_stop):
         headers=auth_headers,
     ).json()
 
-    payload = _route_payload([stop_a["id"], stop_b["id"]], mode="rail")
+    payload = _route_payload([stop_a["id"], stop_b["id"]], mode="minibus")
     payload["number"] = "7R"
     response = client.patch(
         f"/routes/{created['id']}", json=payload, headers=auth_headers
     )
     assert response.status_code == 200
-    assert response.json()["mode"] == "rail"
+    assert response.json()["mode"] == "minibus"
     assert response.json()["number"] == "7R"
 
 

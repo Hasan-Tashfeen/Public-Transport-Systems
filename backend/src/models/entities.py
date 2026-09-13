@@ -26,10 +26,9 @@ from src.models.base import Base
 
 
 class TransportMode(StrEnum):
+    brt = "brt"
     bus = "bus"
-    tram = "tram"
-    metro = "metro"
-    rail = "rail"
+    minibus = "minibus"
 
 
 class ScheduleType(StrEnum):
@@ -81,6 +80,7 @@ class Stop(Base):
         String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
+    area: Mapped[str | None] = mapped_column(String(200), nullable=True)
     lat: Mapped[float] = mapped_column(Float, nullable=False)
     lng: Mapped[float] = mapped_column(Float, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -108,9 +108,7 @@ class RouteStop(Base):
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    route_id: Mapped[str] = mapped_column(
-        ForeignKey("routes.id"), nullable=False
-    )
+    route_id: Mapped[str] = mapped_column(ForeignKey("routes.id"), nullable=False)
     stop_id: Mapped[str] = mapped_column(ForeignKey("stops.id"), nullable=False)
     sequence: Mapped[int] = mapped_column(Integer, nullable=False)
     arrival_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
@@ -126,9 +124,7 @@ class Waypoint(Base):
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    route_id: Mapped[str] = mapped_column(
-        ForeignKey("routes.id"), nullable=False
-    )
+    route_id: Mapped[str] = mapped_column(ForeignKey("routes.id"), nullable=False)
     sequence: Mapped[int] = mapped_column(Integer, nullable=False)
     lat: Mapped[float] = mapped_column(Float, nullable=False)
     lng: Mapped[float] = mapped_column(Float, nullable=False)

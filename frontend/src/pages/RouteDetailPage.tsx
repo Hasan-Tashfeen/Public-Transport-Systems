@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MapView from "../components/MapView";
 import ScheduleView from "../components/ScheduleView";
+import { MODE_COLORS, MODE_LABELS } from "../constants/karachi";
 import { getRoute } from "../services/api";
 import type { RouteDetail } from "../types/api";
 
@@ -34,10 +35,22 @@ export default function RouteDetailPage() {
       <header>
         <Link to="/">Back</Link>
         <h1>
-          {route.number} {route.name ?? ""}
+          <span
+            className="bullet"
+            data-mode={route.mode}
+            style={{ background: MODE_COLORS[route.mode] }}
+            aria-hidden="true"
+          >
+            {route.number}
+          </span>{" "}
+          {route.name ?? `Route ${route.number}`}
         </h1>
-        <p>{route.mode}</p>
-        <button type="button" onClick={() => navigate(`/editor/${route.id}`)}>
+        <p>{MODE_LABELS[route.mode]}</p>
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={() => navigate(`/editor/${route.id}`)}
+        >
           Edit
         </button>
       </header>
@@ -52,9 +65,12 @@ export default function RouteDetailPage() {
           {ordered.map((stop, index) => (
             <li key={`${stop.stop_id}-${index}`}>
               {stop.stop.name}
-              {index === 0 || index === ordered.length - 1
-                ? " (terminal)"
-                : ""}
+              {stop.stop.area ? (
+                <span className="muted"> — {stop.stop.area}</span>
+              ) : null}
+              {(index === 0 || index === ordered.length - 1) && (
+                <span className="terminal"> (terminal)</span>
+              )}
             </li>
           ))}
         </ol>

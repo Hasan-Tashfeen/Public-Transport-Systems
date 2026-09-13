@@ -6,8 +6,9 @@ import {
   TileLayer,
   useMapEvents,
 } from "react-leaflet";
-import type { RouteDetail, Stop } from "../types/api";
+import { KARACHI_BOUNDS, KARACHI_CENTER, KARACHI_ZOOM } from "../constants/karachi";
 import { routePath, uniqueStops } from "../services/geo";
+import type { RouteDetail, Stop } from "../types/api";
 
 interface MapViewProps {
   routes: RouteDetail[];
@@ -17,11 +18,7 @@ interface MapViewProps {
   onMapClick?: (lat: number, lng: number) => void;
 }
 
-function ClickCatcher({
-  onClick,
-}: {
-  onClick?: (lat: number, lng: number) => void;
-}) {
+function ClickCatcher({ onClick }: { onClick?: (lat: number, lng: number) => void }) {
   useMapEvents({
     click(event) {
       onClick?.(event.latlng.lat, event.latlng.lng);
@@ -32,8 +29,8 @@ function ClickCatcher({
 
 export default function MapView({
   routes,
-  center = [0, 0],
-  zoom = 12,
+  center = KARACHI_CENTER,
+  zoom = KARACHI_ZOOM,
   onStopSelect,
   onMapClick,
 }: MapViewProps) {
@@ -43,6 +40,9 @@ export default function MapView({
     <MapContainer
       center={center}
       zoom={zoom}
+      minZoom={10}
+      maxBounds={KARACHI_BOUNDS}
+      maxBoundsViscosity={0.8}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
@@ -54,7 +54,7 @@ export default function MapView({
         <Polyline
           key={route.id}
           positions={routePath(route)}
-          pathOptions={{ color: route.color }}
+          pathOptions={{ color: route.color, weight: 5, opacity: 0.9 }}
         />
       ))}
       {stops.map((stop) => (
@@ -62,7 +62,12 @@ export default function MapView({
           key={stop.id}
           center={[stop.lat, stop.lng]}
           radius={6}
-          pathOptions={{ color: "#111827", fillColor: "#facc15", fillOpacity: 1 }}
+          pathOptions={{
+            color: "#0f172a",
+            weight: 2,
+            fillColor: "#ffffff",
+            fillOpacity: 1,
+          }}
           eventHandlers={{ click: () => onStopSelect?.(stop) }}
         >
           <Popup>{stop.name}</Popup>

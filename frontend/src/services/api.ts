@@ -1,4 +1,5 @@
 import type {
+  PlaceSuggestion,
   RouteDetail,
   RouteInput,
   SearchResults,
@@ -73,6 +74,7 @@ export function getStop(id: string): Promise<StopDetail> {
 
 export function createStop(data: {
   name: string;
+  area?: string | null;
   lat: number;
   lng: number;
 }): Promise<Stop> {
@@ -85,4 +87,10 @@ export function createStop(data: {
 
 export function search(query: string): Promise<SearchResults> {
   return request<SearchResults>(`/search?q=${encodeURIComponent(query)}`);
+}
+
+export function searchPlaces(query: string, limit = 5): Promise<PlaceSuggestion[]> {
+  return request<PlaceSuggestion[]>(
+    `/places?q=${encodeURIComponent(query)}&limit=${limit}`,
+  );
 }

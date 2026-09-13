@@ -33,9 +33,7 @@ def validate_schedule(data: schemas.ScheduleInput) -> None:
     """Enforce fixed vs frequency schedule constraints."""
     if data.type == ScheduleType.fixed:
         if not data.departures or data.service_days is None:
-            raise ValidationError(
-                "fixed schedules require departures and service_days"
-            )
+            raise ValidationError("fixed schedules require departures and service_days")
     elif data.type == ScheduleType.frequency:
         if (
             data.headway_minutes is None
@@ -63,6 +61,7 @@ def _to_route_detail(route: Route) -> schemas.RouteDetail:
                 stop=schemas.Stop(
                     id=rs.stop.id,
                     name=rs.stop.name,
+                    area=rs.stop.area,
                     lat=rs.stop.lat,
                     lng=rs.stop.lng,
                 ),
@@ -113,9 +112,7 @@ def _apply_details(db: Session, route: Route, data: schemas.RouteInput) -> None:
         )
 
     for w in data.waypoints:
-        route.waypoints.append(
-            Waypoint(sequence=w.sequence, lat=w.lat, lng=w.lng)
-        )
+        route.waypoints.append(Waypoint(sequence=w.sequence, lat=w.lat, lng=w.lng))
 
     if data.schedule is not None:
         validate_schedule(data.schedule)
@@ -147,9 +144,7 @@ def get_route(db: Session, route_id: str) -> schemas.RouteDetail:
 
 
 def create_route(db: Session, data: schemas.RouteInput) -> schemas.RouteDetail:
-    route = Route(
-        number=data.number, name=data.name, mode=data.mode, color=data.color
-    )
+    route = Route(number=data.number, name=data.name, mode=data.mode, color=data.color)
     _apply_details(db, route, data)
     db.add(route)
     db.commit()

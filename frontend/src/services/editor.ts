@@ -1,3 +1,4 @@
+import { MODE_COLORS, MODES } from "../constants/karachi";
 import type {
   RouteInput,
   RouteStopInput,
@@ -5,6 +6,8 @@ import type {
   TransportMode,
   WaypointInput,
 } from "../types/api";
+
+export { MODES };
 
 export interface RouteDraft {
   number: string;
@@ -36,17 +39,6 @@ export function buildRouteInput(
   };
 }
 
-export const MODES: TransportMode[] = ["bus", "tram", "metro", "rail"];
-
 export function modeColor(mode: TransportMode): string {
-  switch (mode) {
-    case "bus":
-      return "#e11d48";
-    case "tram":
-      return "#7c3aed";
-    case "metro":
-      return "#2563eb";
-    case "rail":
-      return "#059669";
-  }
+  return MODE_COLORS[mode];
 }

@@ -7,10 +7,7 @@ interface SearchBarProps {
   onSelectStop: (stop: Stop) => void;
 }
 
-export default function SearchBar({
-  onSelectRoute,
-  onSelectStop,
-}: SearchBarProps) {
+export default function SearchBar({ onSelectRoute, onSelectStop }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<{
     routes: Route[];
@@ -27,6 +24,9 @@ export default function SearchBar({
     setResults(found);
   }
 
+  const empty =
+    results !== null && results.routes.length === 0 && results.stops.length === 0;
+
   return (
     <div className="search">
       <input
@@ -41,6 +41,7 @@ export default function SearchBar({
           {results.routes.map((route) => (
             <li key={route.id}>
               <button type="button" onClick={() => onSelectRoute(route)}>
+                <span className="swatch" style={{ background: route.color }} />
                 {route.number} {route.name ?? ""} ({route.mode})
               </button>
             </li>
@@ -52,6 +53,7 @@ export default function SearchBar({
               </button>
             </li>
           ))}
+          {empty && <li className="muted">No results</li>}
         </ul>
       )}
     </div>

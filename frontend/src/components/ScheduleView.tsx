@@ -9,7 +9,7 @@ export default function ScheduleView({ schedule }: { schedule: Schedule | null }
 
   if (schedule.type === "frequency") {
     return (
-      <div>
+      <div className="schedule">
         <p>Runs every {schedule.headway_minutes} minutes</p>
         <p>
           Operating hours: {schedule.start_time} – {schedule.end_time}
@@ -19,11 +19,10 @@ export default function ScheduleView({ schedule }: { schedule: Schedule | null }
   }
 
   return (
-    <div>
+    <div className="schedule">
       <p>Departures: {(schedule.departures ?? []).join(", ")}</p>
       <p>
-        Service days:{" "}
-        {(schedule.service_days ?? []).map((d) => DAYS[d]).join(", ")}
+        Service days: {(schedule.service_days ?? []).map((d) => DAYS[d]).join(", ")}
       </p>
     </div>
   );
@@ -138,9 +137,7 @@ export function ScheduleForm({ value, onChange }: ScheduleFormProps) {
             End time
             <input
               value={value.end_time ?? "23:00"}
-              onChange={(event) =>
-                onChange({ ...value, end_time: event.target.value })
-              }
+              onChange={(event) => onChange({ ...value, end_time: event.target.value })}
             />
           </label>
         </>

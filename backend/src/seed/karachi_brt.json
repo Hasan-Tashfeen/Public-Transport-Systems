@@ -1,0 +1,60 @@
+{
+  "source": "Karachi Breeze (Karachi BRT) public line/station information",
+  "note": "Station coordinates are approximate and intentionally editable by planners.",
+  "city": "Karachi",
+  "lines": [
+    {
+      "number": "G",
+      "name": "Karachi Breeze Green Line",
+      "mode": "brt",
+      "color": "#00933C",
+      "schedule": {
+        "type": "frequency",
+        "headway_minutes": 5,
+        "start_time": "06:00",
+        "end_time": "23:00"
+      },
+      "stops": [
+        { "name": "Numaish Chowrangi", "area": "Saddar, Karachi", "lat": 24.8736, "lng": 67.0335 },
+        { "name": "Patel Para (Guru Mandir)", "area": "Jamshed, Karachi", "lat": 24.879, "lng": 67.033 },
+        { "name": "Lasbela Chowk", "area": "Jamshed, Karachi", "lat": 24.883, "lng": 67.032 },
+        { "name": "Sanitary Market (Gulbahar)", "area": "Gulberg, Karachi", "lat": 24.887, "lng": 67.031 },
+        { "name": "Nazimabad No.1", "area": "Nazimabad, Karachi", "lat": 24.893, "lng": 67.028 },
+        { "name": "Enquiry Office", "area": "Nazimabad, Karachi", "lat": 24.898, "lng": 67.026 },
+        { "name": "Annu Bhai Park", "area": "North Nazimabad, Karachi", "lat": 24.905, "lng": 67.025 },
+        { "name": "Board Office", "area": "North Nazimabad, Karachi", "lat": 24.912, "lng": 67.025 },
+        { "name": "Hyderi", "area": "North Nazimabad, Karachi", "lat": 24.92, "lng": 67.027 },
+        { "name": "Five Star Chowrangi", "area": "North Nazimabad, Karachi", "lat": 24.927, "lng": 67.03 },
+        { "name": "Jummah Bazar", "area": "North Nazimabad, Karachi", "lat": 24.932, "lng": 67.033 },
+        { "name": "Erum Shopping", "area": "North Nazimabad, Karachi", "lat": 24.938, "lng": 67.035 },
+        { "name": "Nagan Chowrangi", "area": "North Karachi, Karachi", "lat": 24.947, "lng": 67.038 },
+        { "name": "U.P. More", "area": "North Karachi, Karachi", "lat": 24.955, "lng": 67.04 },
+        { "name": "Road 4200 (Saleem Centre)", "area": "North Karachi, Karachi", "lat": 24.962, "lng": 67.043 },
+        { "name": "Power House Chowrangi", "area": "North Karachi, Karachi", "lat": 24.97, "lng": 67.046 },
+        { "name": "Road 2400 (Aisha Complex)", "area": "North Karachi, Karachi", "lat": 24.977, "lng": 67.049 },
+        { "name": "2 Minute Chowrangi", "area": "North Karachi, Karachi", "lat": 24.985, "lng": 67.052 },
+        { "name": "4K Chowrangi", "area": "New Karachi, Karachi", "lat": 24.992, "lng": 67.055 },
+        { "name": "Karimi Chowrangi", "area": "New Karachi, Karachi", "lat": 24.999, "lng": 67.058 },
+        { "name": "KDA Flats", "area": "Surjani, Karachi", "lat": 25.005, "lng": 67.06 },
+        { "name": "Abdullah Chowk Terminal", "area": "Surjani, Karachi", "lat": 25.01, "lng": 67.063 }
+      ]
+    },
+    {
+      "number": "O",
+      "name": "Karachi Breeze Orange Line",
+      "mode": "brt",
+      "color": "#FF6319",
+      "schedule": {
+        "type": "frequency",
+        "headway_minutes": 10,
+        "start_time": "06:00",
+        "end_time": "22:00"
+      },
+      "stops": [
+        { "name": "AO Chowk", "area": "North Nazimabad, Karachi", "lat": 24.912, "lng": 67.025 },
+        { "name": "Orangi Station", "area": "Orangi Town, Karachi", "lat": 24.92, "lng": 67.01 },
+        { "name": "Orangi Town Terminal", "area": "Orangi Town, Karachi", "lat": 24.935, "lng": 66.995 }
+      ]
+    }
+  ]
+}

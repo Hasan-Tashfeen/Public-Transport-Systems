@@ -1,9 +1,10 @@
-export type TransportMode = "bus" | "tram" | "metro" | "rail";
+export type TransportMode = "brt" | "bus" | "minibus";
 export type ScheduleType = "fixed" | "frequency";
 
 export interface Stop {
   id: string;
   name: string;
+  area: string | null;
   lat: number;
   lng: number;
 }
@@ -75,4 +76,11 @@ export interface RouteInput {
   stops: RouteStopInput[];
   waypoints: WaypointInput[];
   schedule: Schedule | null;
+}
+
+export interface PlaceSuggestion {
+  name: string;
+  area: string | null;
+  lat: number;
+  lng: number;
 }
