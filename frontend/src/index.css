@@ -1,0 +1,128 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  margin-right: 6px;
+}
+
+.map-page {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  width: 320px;
+  padding: 16px;
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto;
+}
+
+.map-container {
+  flex: 1;
+  height: 100%;
+}
+
+.route-list {
+  list-style: none;
+  padding: 0;
+}
+
+.route-list button {
+  width: 100%;
+  text-align: left;
+  padding: 6px;
+  border: none;
+  background: none;
+}
+
+.mode-filter {
+  display: flex;
+  gap: 6px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.mode-filter button {
+  padding: 4px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.mode-filter button.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.search input {
+  width: 100%;
+  padding: 6px;
+}
+
+.search ul {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0;
+}
+
+.search button {
+  border: none;
+  background: none;
+  padding: 4px;
+  text-align: left;
+}
+
+.detail {
+  padding: 16px;
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: 100%;
+}
+
+.editor-form {
+  padding: 16px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editor-tools {
+  display: flex;
+  gap: 12px;
+}

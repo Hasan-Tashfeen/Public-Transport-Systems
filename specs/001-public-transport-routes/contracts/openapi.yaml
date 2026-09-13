@@ -1,0 +1,297 @@
+openapi: 3.0.3
+info:
+  title: City Public Transport Route Map API
+  version: 0.1.0
+  description: |
+    REST API for viewing and editing public transport routes, stops, and
+    schedules. Editing endpoints require planner authorization.
+servers:
+  - url: http://localhost:8000
+paths:
+  /routes:
+    get:
+      summary: List all routes
+      parameters:
+        - name: mode
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/TransportMode'
+      responses:
+        '200':
+          description: Routes (with geometry and schedule), optionally filtered by mode
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RouteDetail'
+    post:
+      summary: Create a route (planner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteInput'
+      responses:
+        '201':
+          description: Created route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route'
+  /routes/{routeId}:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a route with its ordered stops, waypoints, and schedule
+      responses:
+        '200':
+          description: Route detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+        '404':
+          description: Route not found
+    patch:
+      summary: Update a route (planner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteInput'
+      responses:
+        '200':
+          description: Updated route detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+    delete:
+      summary: Delete a route (planner)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Route deleted
+  /stops:
+    get:
+      summary: List all stops
+      responses:
+        '200':
+          description: All stops
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stop'
+    post:
+      summary: Create a stop (planner)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StopInput'
+      responses:
+        '201':
+          description: Created stop
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stop'
+  /stops/{stopId}:
+    parameters:
+      - name: stopId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a stop with the routes that serve it
+      responses:
+        '200':
+          description: Stop detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopDetail'
+        '404':
+          description: Stop not found
+  /search:
+    get:
+      summary: Search routes and stops by name or number
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matching routes and stops
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    TransportMode:
+      type: string
+      enum: [bus, tram, metro, rail]
+    Route:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: string
+        name:
+          type: string
+          nullable: true
+        mode:
+          $ref: '#/components/schemas/TransportMode'
+        color:
+          type: string
+      required: [id, number, mode, color]
+    RouteInput:
+      type: object
+      properties:
+        number:
+          type: string
+        name:
+          type: string
+          nullable: true
+        mode:
+          $ref: '#/components/schemas/TransportMode'
+        color:
+          type: string
+      required: [number, mode, color]
+    RouteStop:
+      type: object
+      properties:
+        stopId:
+          type: string
+          format: uuid
+        sequence:
+          type: integer
+        arrivalTime:
+          type: string
+          nullable: true
+        departureTime:
+          type: string
+          nullable: true
+      required: [stopId, sequence]
+    Waypoint:
+      type: object
+      properties:
+        sequence:
+          type: integer
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [sequence, lat, lng]
+    Schedule:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [fixed, frequency]
+        serviceDays:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+        departures:
+          type: array
+          items:
+            type: string
+        headwayMinutes:
+          type: integer
+        startTime:
+          type: string
+        endTime:
+          type: string
+      required: [type]
+    RouteDetail:
+      allOf:
+        - $ref: '#/components/schemas/Route'
+        - type: object
+          properties:
+            stops:
+              type: array
+              items:
+                $ref: '#/components/schemas/RouteStop'
+            waypoints:
+              type: array
+              items:
+                $ref: '#/components/schemas/Waypoint'
+            schedule:
+              $ref: '#/components/schemas/Schedule'
+    Stop:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [id, name, lat, lng]
+    StopInput:
+      type: object
+      properties:
+        name:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+      required: [name, lat, lng]
+    StopDetail:
+      allOf:
+        - $ref: '#/components/schemas/Stop'
+        - type: object
+          properties:
+            routes:
+              type: array
+              items:
+                $ref: '#/components/schemas/Route'
+    SearchResults:
+      type: object
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stop'
+      required: [routes, stops]
